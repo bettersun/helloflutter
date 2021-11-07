@@ -35,6 +35,8 @@ class _MyHomePageState extends State<MyHomePage> {
   double contrastRatioLimit = 7.0;
   // 对比度计算结果
   num contrastRatio = 0.0;
+  // 对比度计算结果（字符串）
+  String sContrastRatio = "";
 
   // 红色通道
   double red = 255;
@@ -48,12 +50,7 @@ class _MyHomePageState extends State<MyHomePage> {
   // 文字颜色
   Color colorText = Colors.black;
   // 文字内容
-  String txtRevert = "对比度小于7，文字颜色未反转";
-
-  // 转换为整数
-  String toIntString(double v) {
-    return v.round().toRadixString(10).toString();
-  }
+  String txt = "";
 
   // 转换为16进制的2位数
   String toHexString(double v) {
@@ -67,14 +64,15 @@ class _MyHomePageState extends State<MyHomePage> {
         Color.fromRGBO(red.toInt(), green.toInt(), blue.toInt(), 1.0);
     // 对比度计算结果
     contrastRatio =
-        ColorUtil.calcColorContrastRatio(colorBackground, colorText);
+        ColorUtil.calcColorContrastRatio(colorBackground, Colors.black);
+    sContrastRatio = contrastRatio.toStringAsFixed(2);
     // 文字颜色
     colorText =
         contrastRatio > contrastRatioLimit ? Colors.black : Colors.white;
     // 文字内容
-    txtRevert = contrastRatio > contrastRatioLimit
-        ? "对比度【$contrastRatio】大于7，文字颜色未反转"
-        : "对比度【$contrastRatio】小于7，文字颜色已反转";
+    txt = contrastRatio > contrastRatioLimit
+        ? "(相对于黑色)对比度【$sContrastRatio】大于7，文字颜色设为黑色"
+        : "(相对于黑色)对比度【$sContrastRatio】小于7，文字颜色设为白色";
   }
 
   // 改变红色通道值
@@ -102,6 +100,14 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+
+    // 初始化
+    updateColor();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -119,7 +125,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   alignment: Alignment.center,
                   color: colorBackground,
                   child: Text(
-                    txtRevert,
+                    txt,
                     style: TextStyle(color: colorText),
                   ),
                 ),
@@ -132,7 +138,7 @@ class _MyHomePageState extends State<MyHomePage> {
               children: [
                 SizedBox(
                   width: 30,
-                  child: Text(toIntString(red)),
+                  child: Text(red.toInt().toString()),
                 ),
                 Expanded(
                   child: Slider(
@@ -154,7 +160,7 @@ class _MyHomePageState extends State<MyHomePage> {
               children: [
                 SizedBox(
                   width: 30,
-                  child: Text(toIntString(green)),
+                  child: Text(green.toInt().toString()),
                 ),
                 Expanded(
                   child: Slider(
@@ -176,7 +182,7 @@ class _MyHomePageState extends State<MyHomePage> {
               children: [
                 SizedBox(
                   width: 30,
-                  child: Text(toIntString(blue)),
+                  child: Text(blue.toInt().toString()),
                 ),
                 Expanded(
                   child: Slider(
